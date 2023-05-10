@@ -1,3 +1,12 @@
 import os
+from dotenv import load_dotenv
 
-ACCESS_TOKEN = os.environ.get("ACESS_TOKEN")
+load_dotenv()
+
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+DB_HOST=os.environ.get("DB_HOST")
+DB_PORT=os.environ.get("DB_PORT")
+DB_NAME=os.environ.get("DB_NAME")
+DB_USER=os.environ.get("DB_USER")
+DB_PASSWORD=os.environ.get("DB_PASSWORD")
+
