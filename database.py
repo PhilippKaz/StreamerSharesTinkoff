@@ -1,19 +1,39 @@
-from typing import AsyncGenerator
-
-from sqlalchemy import MetaData
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-
+import psycopg2
 from config import DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER
 
-DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-Base = declarative_base()
+# Connect to your postgres DB
+conn = psycopg2.connect(host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD, port=DB_PORT)
+def connectionToDb():
+    try:
+        print('Открытие соединения с БД')
+        return conn.cursor()
+    except Exception:
+        print('Ошибка: '+Exception)
+def createShares(shareList):
+    cursorDb = connectionToDb()
+    for i in range(len(shareList)):
+        name = shareList[i].name
+        figi = "'"+shareList[i].figi+"'"
+        ticker = "'"+shareList[i].ticker+"'"
+        classCode = "'"+shareList[i].class_code+"'"
+        isin = "'"+shareList[i].isin+"'"
+        lot = shareList[i].lot
+        currency = "'"+shareList[i].currency+"'"
+        uid = "'"+shareList[i].uid+"'"
+        positioUid = "'"+shareList[i].position_uid+"'"
 
-engine = create_async_engine(DATABASE_URL)
-async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+        # SQL = f'INSERT INTO public."Z_SHARES"("NAME", "TICKER", "FIGI", "CLASS_CODE", "ISIN", "LOT", "CURRENCY", "UID", "POSITION_UID") ' \
+        #        f'VALUES ({name},{ticker},{figi},{classCode},{isin},{lot},{currency},{uid},{positioUid});';
+        # cursorDb.execute(SQL)
+        print(name)
+    clostConnectionDb(cursorDb)
 
 
-async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    async with async_session_maker() as session:
-        yield session
+
+
+def clostConnectionDb(cursorClose):
+    print('Закрытие соединения с БД')
+    cursorClose.close()
+    conn.close()
+
+
