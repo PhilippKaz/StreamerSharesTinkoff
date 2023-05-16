@@ -12,20 +12,23 @@ def connectionToDb():
 def createShares(shareList):
     cursorDb = connectionToDb()
     for i in range(len(shareList)):
-        name = shareList[i].name
-        figi = "'"+shareList[i].figi+"'"
-        ticker = "'"+shareList[i].ticker+"'"
-        classCode = "'"+shareList[i].class_code+"'"
-        isin = "'"+shareList[i].isin+"'"
+        name = shareList[i].name.replace( "'", "")
+        figi = shareList[i].figi
+        ticker = shareList[i].ticker
+        classCode = shareList[i].class_code
+        isin = shareList[i].isin
         lot = shareList[i].lot
-        currency = "'"+shareList[i].currency+"'"
-        uid = "'"+shareList[i].uid+"'"
-        positioUid = "'"+shareList[i].position_uid+"'"
+        currency = shareList[i].currency
+        uid = shareList[i].uid
+        positioUid = shareList[i].position_uid
 
-        # SQL = f'INSERT INTO public."Z_SHARES"("NAME", "TICKER", "FIGI", "CLASS_CODE", "ISIN", "LOT", "CURRENCY", "UID", "POSITION_UID") ' \
-        #        f'VALUES ({name},{ticker},{figi},{classCode},{isin},{lot},{currency},{uid},{positioUid});';
-        # cursorDb.execute(SQL)
-        print(name)
+        SQL = f'INSERT INTO public."Z_SHARES"("NAME", "TICKER", "FIGI", "CLASS_CODE", "ISIN", "LOT", "CURRENCY", "UID", "POSITION_UID") ' \
+               f'''VALUES ('{name}','{ticker}','{figi}','{classCode}','{isin}',{lot},'{currency}','{uid}','{positioUid}');''';
+        # print(SQL)
+        cursorDb.execute(SQL)
+        conn.commit()
+
+
     clostConnectionDb(cursorDb)
 
 
