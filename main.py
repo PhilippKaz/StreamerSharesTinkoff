@@ -1,7 +1,7 @@
-import os
 import time
-from datetime import timedelta
-import logging
+import collections
+import datetime
+
 
 
 from tinkoff.invest import (
@@ -20,8 +20,8 @@ from tinkoff.invest.utils import now
 
 from config import ACCESS_TOKEN
 from database import createShares
+from transformation import *
 
-# logging.basicConfig(format="%(asctime)s %(levelname)s:%(message)s", level=logging.DEBUG)
 
 
 # Функция добавления акций в БД
@@ -56,24 +56,56 @@ def streamingShares(shareFIGI):
 
 
 def main():
+    historyShare = {}
+    historyShareDetail = {}
     retry_settings = RetryClientSettings(use_retry=True, max_retry_attempt=2)
-    i = 0
-    candleShareDict = {}
     with RetryingClient(ACCESS_TOKEN, settings=retry_settings) as client:
         for candle in client.get_all_candles(
-                figi="BBG005D1WCQ1",
+                figi="BBG004S68JR8",
                 from_=now() - timedelta(days=1),
                 interval=CandleInterval.CANDLE_INTERVAL_1_MIN,
         ):
-            i += 1
-            candleShareDict = {'id':i,'time': (candle.time + timedelta(hours=3)).strftime('%d.%m.%Y-%H:%M:%S')}
-
-            # print((candle.time + timedelta(hours=3)).strftime('%d.%m.%Y-%H:%M:%S'))
-            # print(float(str(candle.open.units) + "." + str(candle.open.nano)))
-        print(candleShareDict.items())
+            historyShareDetail['realPrice'] = convertToRealPrice(candle.open.units, candle.open.nano)
+            historyShareDetail['unitsPrice'] = candle.open.units
+            historyShareDetail['nanoPrice'] = candle.open.units
+            # historyShareDetail['timeCandle'] = convertToRealDateTime(candle.time)
 
 
-    # streamingShares('BBG005D1WCQ1')
+            historyShare[convertToTimeStamp(candle.time)] = historyShareDetail
+
+        [last] = collections.deque(historyShare, maxlen=1)
+
+        print(type(last))
+
+        # minutesAgo1 = candle - timedelta(minutes=1)
+        # minutesAgo5 = last - timedelta(minutes=5)
+        # minutesAgo15 = last - timedelta(minutes=15)
+        # minutesAgo30 = last - timedelta(minutes=30)
+        # minutesAgo60 = last - timedelta(minutes=60)
+        # hoursAgo4 = last - timedelta(hours=4)
+        # hoursAgo8 = last - timedelta(hours=8)
+        # hoursAgo24 = last - timedelta(hours=24)
+
+        # print(minutesAgo5)
+        # print(minutesAgo15)
+        # print(minutesAgo30)
+        # print(minutesAgo60)
+        # print(hoursAgo4)
+        # print(hoursAgo8)
+        # print(hoursAgo24)
+
+
+
+
+
+
+
+            # print(convertToRealDateTime(candle.time))
+            # print(convertToRealPirce(candle.open.units, candle.open.nano))
+
+
+
+
 
 
 
