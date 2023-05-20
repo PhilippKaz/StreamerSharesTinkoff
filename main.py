@@ -17,7 +17,7 @@ from tinkoff.invest.retrying.sync.client import RetryingClient
 from tinkoff.invest.utils import now
 
 from config import ACCESS_TOKEN
-from database import createShares
+from database import *
 from transformation import *
 
 
@@ -53,13 +53,12 @@ def streamingShares(shareFIGI):
         ):
             print(marketdata)
 
-
-def main():
+def streamingDifferenceShare(shareFIGI):
     historyShare = {}
     retry_settings = RetryClientSettings(use_retry=True, max_retry_attempt=2)
     with RetryingClient(ACCESS_TOKEN, settings=retry_settings) as client:
         for candle in client.get_all_candles(
-                figi="BBG006L8G4H1",
+                figi=shareFIGI,
                 from_=now() - timedelta(days=1),
                 interval=CandleInterval.CANDLE_INTERVAL_1_MIN,
         ):
@@ -69,10 +68,9 @@ def main():
             historyShareDetail['unitsPrice'] = candle.open.units
             historyShareDetail['nanoPrice'] = candle.open.nano
             historyShareDetail['timeCandle'] = convertToRealDateTime(candle.time)
-            
+
             # Формирование словаря
             historyShare[convertToTimeStamp(candle.time)] = historyShareDetail
-
 
         [last] = collections.deque(historyShare, maxlen=1)
         [first] = collections.deque(historyShare, maxlen=1)
@@ -84,8 +82,6 @@ def main():
         mAgo60 = last - (timedelta(minutes=60).total_seconds())
         hAgo4 = last - (timedelta(hours=4).total_seconds())
         hAgo8 = last - (timedelta(hours=8).total_seconds())
-        hAgo24 = first
-
 
         shareNow = historyShare.get(last)
         shareMAgo1 = historyShare.get(mAgo1)
@@ -95,16 +91,23 @@ def main():
         shareMAgo60 = historyShare.get(mAgo60)
         shareHAgo4 = historyShare.get(hAgo4)
         shareHAgo8 = historyShare.get(hAgo8)
-        shareHAgo24 = historyShare.get(hAgo24)
+        shareHAgo24 = historyShare.get(first)
 
-        print(getDiffPercent(shareNow['realPrice'], shareMAgo1['realPrice']))
-        print(getDiffPercent(shareNow['realPrice'], shareMAgo5['realPrice']))
-        print(getDiffPercent(shareNow['realPrice'], shareMAgo15['realPrice']))
-        print(getDiffPercent(shareNow['realPrice'], shareMAgo30['realPrice']))
-        print(getDiffPercent(shareNow['realPrice'], shareMAgo60['realPrice']))
-        print(getDiffPercent(shareNow['realPrice'], shareHAgo4['realPrice']))
-        print(getDiffPercent(shareNow['realPrice'], shareHAgo8['realPrice']))
-        print(getDiffPercent(shareNow['realPrice'], shareHAgo24['realPrice']))
+        getDiffPercent(shareNow, shareMAgo1, 1)
+        getDiffPercent(shareNow, shareMAgo5, 1)
+        getDiffPercent(shareNow, shareMAgo15, 1)
+        getDiffPercent(shareNow, shareMAgo30, 1)
+        getDiffPercent(shareNow, shareMAgo60, 1)
+        getDiffPercent(shareNow, shareHAgo4, 1)
+        getDiffPercent(shareNow, shareHAgo8, 1)
+        getDiffPercent(shareNow, shareHAgo24, 2)
+
+def main():
+    shareList = getShareRub()
+
+
+
+
 
 
 

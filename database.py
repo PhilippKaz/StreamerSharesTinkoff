@@ -32,6 +32,14 @@ def createShares(shareList):
     clostConnectionDb(cursorDb)
 
 
+def getShareRub():
+    cursorDb = connectionToDb()
+    SQL =f'''select * from public."Z_SHARES" where "CURRENCY" = 'rub'''+"'"
+    cursorDb.execute(SQL)
+    listShare = cursorDb.fetchall()
+    clostConnectionDb(cursorDb)
+    return listShare
+
 
 
 def clostConnectionDb(cursorClose):
