@@ -37,7 +37,6 @@ def streamingShares(shareFIGI):
                 waiting_close=True,
                 subscription_action=SubscriptionAction.SUBSCRIPTION_ACTION_SUBSCRIBE,
                 instruments=[CandleInstrument(
-                    # figi="BBG005D1WCQ1",
                     figi=shareFIGI,
                     interval=SubscriptionInterval.SUBSCRIPTION_INTERVAL_ONE_MINUTE,
                 )
@@ -53,7 +52,7 @@ def streamingShares(shareFIGI):
         ):
             print(marketdata)
 
-def streamingDifferenceShare(shareFIGI):
+def getDiffShare(shareFIGI):
     historyShare = {}
     retry_settings = RetryClientSettings(use_retry=True, max_retry_attempt=2)
     with RetryingClient(ACCESS_TOKEN, settings=retry_settings) as client:
@@ -102,8 +101,17 @@ def streamingDifferenceShare(shareFIGI):
         getDiffPercent(shareNow, shareHAgo8, 1)
         getDiffPercent(shareNow, shareHAgo24, 2)
 
-def main():
+
+
+def streamingShareOnline():
     shareList = getShareRub()
+    while True:
+        for share in shareList:
+            getDiffShare(share[3])
+            time.sleep(5)
+
+def main():
+    null
 
 
 
