@@ -24,7 +24,6 @@ def createShares(shareList):
 
         SQL = f'INSERT INTO public."Z_SHARES"("NAME", "TICKER", "FIGI", "CLASS_CODE", "ISIN", "LOT", "CURRENCY", "UID", "POSITION_UID") ' \
                f'''VALUES ('{name}','{ticker}','{figi}','{classCode}','{isin}',{lot},'{currency}','{uid}','{positioUid}');''';
-        # print(SQL)
         cursorDb.execute(SQL)
         conn.commit()
 
