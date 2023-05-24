@@ -46,18 +46,19 @@ def extractionHistoryData(historyShare):
     dictHistory = {}
     diffHistoryList = {}
     exctractHistoryData = {}
-    [last] = collections.deque(historyShare, maxlen=1)
-    [first] = collections.deque(historyShare, maxlen=1)
 
-    mAgo1 = last - (timedelta(minutes=1).total_seconds())
-    mAgo5 = last - (timedelta(minutes=5).total_seconds())
-    mAgo15 = last - (timedelta(minutes=15).total_seconds())
-    mAgo30 = last - (timedelta(minutes=30).total_seconds())
-    mAgo60 = last - (timedelta(minutes=60).total_seconds())
-    hAgo4 = last - (timedelta(hours=4).total_seconds())
-    hAgo8 = last - (timedelta(hours=8).total_seconds())
+    first_key, first_value = next(iter(historyShare.items()))
+    last_key, last_value = next(iter(reversed(historyShare.items())))
 
-    shareNow = historyShare.get(last)
+    mAgo1 = last_key - (timedelta(minutes=1).total_seconds())
+    mAgo5 = last_key - (timedelta(minutes=5).total_seconds())
+    mAgo15 = last_key - (timedelta(minutes=15).total_seconds())
+    mAgo30 = last_key - (timedelta(minutes=30).total_seconds())
+    mAgo60 = last_key - (timedelta(minutes=60).total_seconds())
+    hAgo4 = last_key - (timedelta(hours=4).total_seconds())
+    hAgo8 = last_key - (timedelta(hours=8).total_seconds())
+
+    shareNow = historyShare.get(last_key)
     shareMAgo1 = historyShare.get(mAgo1)
     shareMAgo5 = historyShare.get(mAgo5)
     shareMAgo15 = historyShare.get(mAgo15)
@@ -65,17 +66,17 @@ def extractionHistoryData(historyShare):
     shareMAgo60 = historyShare.get(mAgo60)
     shareHAgo4 = historyShare.get(hAgo4)
     shareHAgo8 = historyShare.get(hAgo8)
-    shareHAgo24 = historyShare.get(first)
+    shareHAgo24 = historyShare.get(first_key)
 
     dictHistory['shareNow'] = shareNow
     dictHistory['shareMAgo1'] = shareMAgo1
     dictHistory['shareMAgo5'] = shareMAgo5
     dictHistory['shareMAgo15'] = shareMAgo15
-    dictHistory['shareMAgo30'] = shareMAgo30
-    dictHistory['shareMAgo60'] = shareMAgo60
-    dictHistory['shareHAgo4'] = shareHAgo4
-    dictHistory['shareHAgo8'] = shareHAgo8
-    dictHistory['shareHAgo24'] = shareHAgo24
+    # dictHistory['shareMAgo30'] = shareMAgo30
+    # dictHistory['shareMAgo60'] = shareMAgo60
+    # dictHistory['shareHAgo4'] = shareHAgo4
+    # dictHistory['shareHAgo8'] = shareHAgo8
+    # dictHistory['shareHAgo24'] = shareHAgo24
 
     # Чистим словарь от None
     exctractHistoryData = {key:value for key, value in dictHistory.items() if value is not None}
@@ -84,9 +85,10 @@ def extractionHistoryData(historyShare):
 
     for shareDiff in diffHistoryData.keys():
         ticker = diffHistoryData[shareDiff]['ticker']
-        diffPrice = format(diffHistoryData[shareDiff]['diffPrice'], '.10')
+        # diffPercent = format(diffHistoryData[shareDiff]['diffPercent'], '.15')
+        diffPercent = diffHistoryData[shareDiff]['diffPercent']
         time = diffHistoryData[shareDiff]['timeCandle']
 
-        if (float(diffPrice)) > 1:
-            message = '#'+ticker+' Изменение: '+str(diffPrice) + '% Время: ' + str(time)
+        if (abs(float(diffPercent))) > 1:
+            message = '#'+ticker+' Изменение: '+str(diffPercent) + '% Время: ' + str(time)
             print(message)

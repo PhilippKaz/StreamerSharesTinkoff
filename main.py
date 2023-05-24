@@ -1,4 +1,5 @@
 import time
+import traceback
 
 from tinkoff.invest import CandleInterval
 from tinkoff.invest.retrying.settings import RetryClientSettings
@@ -40,14 +41,15 @@ def streamingShareOnline():
     shareList = getShareRub()
     while True:
         for share in shareList:
-            try:
-                historyShare = getHistoryShare(share)
+            # try:
+            historyShare = getHistoryShare(share)
+            if len(historyShare) > 0:
                 extractionHistoryData(historyShare)
                 time.sleep(1.2)
-            except Exception:
-                continue
-            finally:
-                continue
+            # except Exception:
+            #     continue
+            # finally:
+            #     continue
 
 def main():
     streamingShareOnline()
