@@ -1,5 +1,6 @@
 import time
-import traceback
+import telebot
+
 
 from tinkoff.invest import CandleInterval
 from tinkoff.invest.retrying.settings import RetryClientSettings
@@ -39,17 +40,20 @@ def getHistoryShare(shareList):
 
 def streamingShareOnline():
     shareList = getShareRub()
+
     while True:
         for share in shareList:
-            # try:
-            historyShare = getHistoryShare(share)
-            if len(historyShare) > 0:
-                extractionHistoryData(historyShare)
-                time.sleep(1.2)
-            # except Exception:
-            #     continue
-            # finally:
-            #     continue
+            try:
+                historyShare = getHistoryShare(share)
+                if len(historyShare) > 0:
+                    if historyShare is not None:
+                        extractionHistoryData(historyShare)
+                        time.sleep(1.2)
+            except Exception as error:
+                print(error)
+                continue
+            finally:
+                continue
 
 def main():
     streamingShareOnline()

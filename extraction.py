@@ -1,6 +1,10 @@
-import collections
 from datetime import timedelta
 
+import telebot
+
+from config import TOKEN_BOT, CHAT_ID
+
+bot = telebot.TeleBot(TOKEN_BOT)
 
 def extractDiff(exctractHistoryData):
     historyShareDiff = {}
@@ -43,6 +47,7 @@ def extractDiff(exctractHistoryData):
 
 
 def extractionHistoryData(historyShare):
+    message = ''
     dictHistory = {}
     diffHistoryList = {}
     exctractHistoryData = {}
@@ -71,7 +76,7 @@ def extractionHistoryData(historyShare):
     dictHistory['shareNow'] = shareNow
     dictHistory['shareMAgo1'] = shareMAgo1
     dictHistory['shareMAgo5'] = shareMAgo5
-    dictHistory['shareMAgo15'] = shareMAgo15
+    # dictHistory['shareMAgo15'] = shareMAgo15
     # dictHistory['shareMAgo30'] = shareMAgo30
     # dictHistory['shareMAgo60'] = shareMAgo60
     # dictHistory['shareHAgo4'] = shareHAgo4
@@ -85,10 +90,12 @@ def extractionHistoryData(historyShare):
 
     for shareDiff in diffHistoryData.keys():
         ticker = diffHistoryData[shareDiff]['ticker']
-        # diffPercent = format(diffHistoryData[shareDiff]['diffPercent'], '.15')
         diffPercent = diffHistoryData[shareDiff]['diffPercent']
         time = diffHistoryData[shareDiff]['timeCandle']
 
         if (abs(float(diffPercent))) > 1:
-            message = '#'+ticker+' Изменение: '+str(diffPercent) + '% Время: ' + str(time)
-            print(message)
+            message = '#'+ticker+' Изменение: '+str(diffPercent) + '% Время: ' + str(time) + '\n' + message
+
+    if len(message) > 0:
+        bot.send_message(CHAT_ID, message)
+
